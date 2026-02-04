@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GeoTemporal UUID</title>
+    <style>
+        body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; padding: 0 1rem; line-height: 1.5; }
+        .card { border: 1px solid #ccc; padding: 1.5rem; border-radius: 8px; margin-bottom: 2rem; }
+        .form-group { margin-bottom: 1rem; }
+        label { display: block; margin-bottom: 0.5rem; font-weight: bold; }
+        input { width: 100%; padding: 0.5rem; box-sizing: border-box; }
+        button { background: #0066cc; color: white; border: none; padding: 0.75rem 1.5rem; border-radius: 4px; cursor: pointer; }
+        button:hover { background: #0052a3; }
+        pre { background: #f4f4f4; padding: 1rem; overflow-x: auto; border-radius: 4px; }
+        .error { color: #d32f2f; margin-top: 0.5rem; }
+    </style>
+</head>
+<body>
+    <h1>GeoTemporal UUID Generator</h1>
+    <p>A UUID generated from Latitude, Longitude, and Time using Z-order curve interleaving.</p>
+
+    <div class="card">
+        <h2>Generate UUID</h2>
+        <div class="form-group">
+            <label for="lat">Latitude</label>
+            <input type="number" id="lat" step="any" value="37.7749">
+        </div>
+        <div class="form-group">
+            <label for="lon">Longitude</label>
+            <input type="number" id="lon" step="any" value="-122.4194">
+        </div>
+        <div class="form-group">
+            <label for="time">Time (Optional, ISO string or leave empty for Now)</label>
+            <input type="datetime-local" id="time">
+        </div>
+        <button id="btn-gen">Generate</button>
+        <div id="gen-result"></div>
+    </div>
+
+    <div class="card">
+        <h2>Decode UUID</h2>
+        <div class="form-group">
+            <label for="uuid-in">UUID</label>
+            <input type="text" id="uuid-in" placeholder="xxxxxxxx-xxxx-xxxx-xxxx-xxxxxxxxxxxx">
+        </div>
+        <button id="btn-decode">Decode</button>
+        <div id="decode-result"></div>
+    </div>
+
+    <script type="module">
+        import init, { generate_uuid, decode_uuid } from './pkg/geotemporal_uuid.js';
+
+        async function run() {
+            await init();
+
+            document.getElementById('btn-gen').addEventListener('click', () => {
+                const lat = parseFloat(document.getElementById('lat').value);
+                const lon = parseFloat(document.getElementById('lon').value);
+                const timeStr = document.getElementById('time').value;
+                
+                // Pass string directly if exists, otherwise null
+                const timeArg = timeStr ? new Date(timeStr).toISOString() : null;
+
+                try {
+                    const uuid = generate_uuid(lat, lon, timeArg);
+                    document.getElementById('gen-result').innerHTML = `<pre>${uuid}</pre>`;
+                } catch (e) {
+                    document.getElementById('gen-result').innerHTML = `<div class="error">Error: ${e}</div>`;
+                }
+            });
+
+            document.getElementById('btn-decode').addEventListener('click', () => {
+                const str = document.getElementById('uuid-in').value.trim();
+                try {
+                    const res = decode_uuid(str);
+                    const [lat, lon, timeMs] = res;
+                    const date = new Date(timeMs);
+                    
+                    document.getElementById('decode-result').innerHTML = `
+                        <pre>
+Latitude:  ${lat}
+Longitude: ${lon}
+Time:      ${date.toISOString()} (${timeMs})
+                        </pre>
+                    `;
+                } catch (e) {
+                    document.getElementById('decode-result').innerHTML = `<div class="error">Error: ${e}</div>`;
+                }
+            });
+        }
+
+        run();
+    </script>
+</body>
+</html>

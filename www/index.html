@@ -58,7 +58,7 @@
                 const lat = parseFloat(document.getElementById('lat').value);
                 const lon = parseFloat(document.getElementById('lon').value);
                 const timeStr = document.getElementById('time').value;
-                
+
                 // Pass string directly if exists, otherwise null
                 const timeArg = timeStr ? new Date(timeStr).toISOString() : null;
 
@@ -76,7 +76,7 @@
                     const res = decode_uuid(str);
                     const [lat, lon, timeMs] = res;
                     const date = new Date(timeMs);
-                    
+
                     document.getElementById('decode-result').innerHTML = `
                         <pre>
 Latitude:  ${lat}

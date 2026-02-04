@@ -18,11 +18,11 @@ enum Commands {
         /// Latitude (-90 to 90)
         #[arg(long)]
         lat: f64,
-        
+
         /// Longitude (-180 to 180)
         #[arg(long)]
         lon: f64,
-        
+
         /// Optional Timestamp (ms or ISO-8601). Defaults to now.
         #[arg(long)]
         time: Option<String>,

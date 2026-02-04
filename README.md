@@ -15,20 +15,20 @@ This means that UUIDs generated near the same time and place will be numerically
 *   **Version:** 7 (Custom layout compatible with UUIDv7 parsers)
 *   **Variant:** 10 (Standard RFC 4122)
 *   **Payload Construction:**
-    *   **Tier 1 (Bits 0-96):** A Z-Curve interleaving of:
-        *   Time (48 bits)
-        *   Latitude (24 bits, ~1.1m precision)
-        *   Longitude (25 bits, ~1.1m precision)
-    *   **Tier 2 (Bits 97-121):** Remaining low-order bits and Randomness (25 bits) to ensure uniqueness.
+    *   **Tier 1 (Bits 0-80 roughly):** A Z-Curve interleaving of:
+        *   Time (32 bits, Seconds precision)
+        *   Latitude (24 bits, ~1.2m precision)
+        *   Longitude (25 bits, ~1.2m precision)
+    *   **Tier 2 (Bits 81-121):** Randomness (41 bits) to ensure uniqueness.
 
 The interleaving starts from the most significant bit, ensuring effective multidimensional sorting.
 
 ### Precision & Collision Resistance
 
 **Temporal Precision:**
-*   48 bits are dedicated to validity in milliseconds (Unix Epoch).
-*   Correctness is maintained to the **millisecond**.
-*   Range: Valid through year ~10,889 AD.
+*   32 bits are dedicated to validity in **seconds** (Unix Epoch).
+*   Correctness is maintained to the **second**.
+*   Range: Valid through year 2106 AD.
 
 **Spatial Precision:**
 *   **Latitude:** 24 bits (~1.19 meters).
@@ -36,10 +36,10 @@ The interleaving starts from the most significant bit, ensuring effective multid
 *   Points within this grid are considered strictly identical spatially.
 
 **Collision Likelihood:**
-*   Collisions can only occur if two IDs are generated at the **exact same millisecond** AND within the **same 1.2m² grid cell**.
-*   Even then, there are **25 bits of randomness** (~33.5 million values) to distinguish them.
-*   By the Birthday Paradox, you would need to generate ~6,800 IDs *per millisecond* in the *same 1 meter spot* to have a 50% chance of collision.
-*   This is sufficient for almost all high-throughput geospatial applications.
+*   Collisions can only occur if two IDs are generated at the **exact same second** AND within the **same 1.2m² grid cell**.
+*   Even then, there are **41 bits of randomness** (~2.2 trillion values) to distinguish them.
+*   By the Birthday Paradox, you would need to generate ~1.5 million IDs *per second* in the *same 1 meter spot* to have a 50% chance of collision.
+*   This provides extremely high collision resistance for distributed systems.
 
 ## Usage
 

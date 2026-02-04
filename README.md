@@ -23,6 +23,24 @@ This means that UUIDs generated near the same time and place will be numerically
 
 The interleaving starts from the most significant bit, ensuring effective multidimensional sorting.
 
+### Precision & Collision Resistance
+
+**Temporal Precision:**
+*   48 bits are dedicated to validity in milliseconds (Unix Epoch).
+*   Correctness is maintained to the **millisecond**.
+*   Range: Valid through year ~10,889 AD.
+
+**Spatial Precision:**
+*   **Latitude:** 24 bits (~1.19 meters).
+*   **Longitude:** 25 bits (~1.19 meters at equator).
+*   Points within this grid are considered strictly identical spatially.
+
+**Collision Likelihood:**
+*   Collisions can only occur if two IDs are generated at the **exact same millisecond** AND within the **same 1.2m² grid cell**.
+*   Even then, there are **25 bits of randomness** (~33.5 million values) to distinguish them.
+*   By the Birthday Paradox, you would need to generate ~6,800 IDs *per millisecond* in the *same 1 meter spot* to have a 50% chance of collision.
+*   This is sufficient for almost all high-throughput geospatial applications.
+
 ## Usage
 
 ### Rust Library
@@ -39,11 +57,11 @@ use geotemporal_uuid::GeoTemporalUuid;
 fn main() {
     let lat = 37.7749;
     let lon = -122.4194;
-    
+
     // Generate
     let uuid = GeoTemporalUuid::new(lat, lon, None).unwrap();
     println!("{}", uuid);
-    
+
     // Decode
     let (d_lat, d_lon, d_time) = uuid.decode();
 }
